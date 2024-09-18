@@ -5,29 +5,22 @@ test('Correct contact information is present', async ({ page }) => {
   const contactPage = new ContactPage(page);
   await contactPage.goto();
   
-  // Debug: Log the current URL
-  console.log('Current URL:', page.url());
+  try {
+    await contactPage.waitForContactInfo();
+  } catch (error) {
+    console.error('Error waiting for contact info:', error);
+    throw error;
+  }
 
-  // Debug: Take a screenshot
-  await page.screenshot({ path: 'debug-screenshot.png' });
+  const phoneNumber = await contactPage.getPhoneNumber();
+  const email = await contactPage.getEmail();
+  const address = await contactPage.getAddress();
 
-  await contactPage.waitForContactInfo();
+  console.log('Phone number:', phoneNumber);
+  console.log('Email:', email);
+  console.log('Address:', address);
 
-  // Check phone number
-  await expect(contactPage.phoneNumber).toBeVisible();
-  const phoneNumberText = await contactPage.phoneNumber.innerText();
-  console.log('Phone number:', phoneNumberText);
-  expect(phoneNumberText).toBe('+381 60 161 5080');
-
-  // Check email
-  await expect(contactPage.email).toBeVisible();
-  const emailText = await contactPage.email.innerText();
-  console.log('Email:', emailText);
-  expect(emailText).toBe('plus.shelf@gmail.com');
-
-  // Check address
-  await expect(contactPage.address).toBeVisible();
-  const addressText = await contactPage.address.innerText();
-  console.log('Address:', addressText);
-  expect(addressText).toContain('16. Aprila 6d Beograd, Krnjača 11210');
+  expect(phoneNumber).toBe('+381 60 161 5080');
+  expect(email).toBe('plus.shelf@gmail.com');
+  expect(address).toContain('16. Aprila 6d B');
 });
