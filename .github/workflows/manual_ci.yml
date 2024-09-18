@@ -16,6 +16,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        worker: [1, 2, 3]
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js
@@ -27,9 +30,9 @@ jobs:
     - name: Run tests
       run: |
         if [ "${{ github.event.inputs.test_type }}" = "unit" ]; then
-          npm run test:unit
+          npm run test:unit -- --shard=${{ matrix.worker }}/3
         elif [ "${{ github.event.inputs.test_type }}" = "integration" ]; then
-          npm run test:integration
+          npm run test:integration -- --shard=${{ matrix.worker }}/3
         else
-          npm test
+          npm test -- --shard=${{ matrix.worker }}/3
         fi
